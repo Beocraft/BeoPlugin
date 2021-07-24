@@ -1,0 +1,6 @@
+name: BeoPlugin
+version: ${project.version}
+main: net.beocraft.plugin.BeoPlugin
+api-version: 1.17
+load: STARTUP
+description: The main server plugin

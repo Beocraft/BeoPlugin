@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerAdvancementDoneEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.server.ServerLoadEvent;
@@ -61,10 +62,10 @@ public class DiscordLogs implements Listener {
         Player player = event.getPlayer();
         plugin.getWebhook().send(new WebhookMessageBuilder()
                 .setUsername(player.getName())
-                .setAvatarUrl(generateUrl(player))
+                .setAvatarUrl(generateAvatarUrl(player))
                 .addEmbeds(new WebhookEmbedBuilder()
                         .setColor(Constants.JOIN_COLOR)
-                        .setDescription("**Player joined the game**")
+                        .setDescription("**" + player.getName() + " joined the game**")
                         .addField(currentlyOnline(false))
                         .setTimestamp(Instant.now())
                         .build())
@@ -76,10 +77,10 @@ public class DiscordLogs implements Listener {
         Player player = event.getPlayer();
         plugin.getWebhook().send(new WebhookMessageBuilder()
                 .setUsername(player.getName())
-                .setAvatarUrl(generateUrl(player))
+                .setAvatarUrl(generateAvatarUrl(player))
                 .addEmbeds(new WebhookEmbedBuilder()
                         .setColor(Constants.QUIT_COLOR)
-                        .setDescription("**Player left the game**")
+                        .setDescription("**" + player.getName() + " left the game**")
                         .addField(currentlyOnline(true))
                         .setTimestamp(Instant.now())
                         .build())
@@ -91,14 +92,38 @@ public class DiscordLogs implements Listener {
         Player player = event.getEntity();
         Location location = player.getLocation();
         String world = StringUtils.capitalize(Objects.requireNonNull(player.getLocation().getWorld()).getName().replace("_", " "));
-        String format = String.format("%s: %s %s %s", world, location.getBlockX(), location.getBlockY(), location.getBlockZ());
+        String format = String.format("%s: x:`%s` y:`%s` z:`%s`", world, location.getBlockX(), location.getBlockY(), location.getBlockZ());
         plugin.getWebhook().send(new WebhookMessageBuilder()
                 .setUsername(player.getName())
-                .setAvatarUrl(generateUrl(player))
+                .setAvatarUrl(generateAvatarUrl(player))
                 .addEmbeds(new WebhookEmbedBuilder()
                         .setColor(Constants.DEATH_COLOR)
                         .setDescription("**" + ChatColor.stripColor(event.getDeathMessage()) + "**")
                         .addField(new WebhookEmbed.EmbedField(false, "Location:", format))
+                        .setTimestamp(Instant.now())
+                        .build())
+                .build());
+    }
+
+    @EventHandler
+    public void onPlayerAdvancementDoneEvent(PlayerAdvancementDoneEvent event) {
+        String[] advancement = event.getAdvancement().getKey().getKey().split("/");
+        // Recipes should not be displayed
+        if (advancement[0].equalsIgnoreCase("recipes")) {
+            return;
+        }
+        String category = StringUtils.capitalize(advancement[0]);
+        String name = StringUtils.capitalize(advancement[1].replace("_", " "));
+        String format = String.format("%s: %s", category, name);
+
+        Player player = event.getPlayer();
+        plugin.getWebhook().send(new WebhookMessageBuilder()
+                .setUsername(player.getName())
+                .setAvatarUrl(generateAvatarUrl(player))
+                .addEmbeds(new WebhookEmbedBuilder()
+                        .setColor(Constants.SYSTEM_COLOR)
+                        .setDescription("**" + player.getName() + " made an advancement**")
+                        .addField(new WebhookEmbed.EmbedField(false, "Advancement:", format))
                         .setTimestamp(Instant.now())
                         .build())
                 .build());
@@ -111,7 +136,7 @@ public class DiscordLogs implements Listener {
         return new WebhookEmbed.EmbedField(false, "Online:", online);
     }
 
-    private String generateUrl(Player player) {
+    private String generateAvatarUrl(Player player) {
         String uuid = player.getUniqueId().toString().replace("-", "");
         return "https://crafatar.com/avatars/" + uuid;
     }

@@ -21,11 +21,13 @@ public final class BeoPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        webhook.send(new WebhookEmbedBuilder()
-                .setColor(Constants.SYSTEM_COLOR)
-                .setDescription("**Server starting**")
-                .setTimestamp(Instant.now())
-                .build());
+        new Thread(() -> {
+            webhook.send(new WebhookEmbedBuilder()
+                    .setColor(Constants.SYSTEM_COLOR)
+                    .setDescription("**Server starting**")
+                    .setTimestamp(Instant.now())
+                    .build());
+        }).start();
 
         PluginManager manager = getServer().getPluginManager();
         manager.registerEvents(new DiscordLogs(this), this);

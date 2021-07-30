@@ -9,11 +9,12 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.NotNull;
 
 public class CustomMobs implements Listener {
 
     @EventHandler
-    public void onEntityDeathEvent(EntityDeathEvent event) {
+    public void onEntityDeathEvent(@NotNull EntityDeathEvent event) {
         Entity entity = event.getEntity();
         EntityType type = entity.getType();
         if (type == EntityType.SHULKER) {
@@ -30,7 +31,7 @@ public class CustomMobs implements Listener {
     }
 
     @EventHandler
-    public void onEntitySpawnEvent(EntitySpawnEvent event) {
+    public void onEntitySpawnEvent(@NotNull EntitySpawnEvent event) {
         Entity entity = event.getEntity();
         if (entity instanceof Bat) {
             event.setCancelled(true);

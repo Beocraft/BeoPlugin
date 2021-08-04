@@ -6,7 +6,9 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityChangeBlockEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.inventory.ItemStack;
 import org.jetbrains.annotations.NotNull;
@@ -34,6 +36,21 @@ public class CustomMobs implements Listener {
     public void onEntitySpawnEvent(@NotNull EntitySpawnEvent event) {
         Entity entity = event.getEntity();
         if (entity instanceof Bat) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onEntityExplodeEvent(EntityExplodeEvent event) {
+        EntityType type = event.getEntityType();
+        if (type == EntityType.ENDER_DRAGON || type == EntityType.FIREBALL) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onEntityChangeBlockEvent(EntityChangeBlockEvent event) {
+        if (event.getEntity().getType() == EntityType.ENDERMAN) {
             event.setCancelled(true);
         }
     }

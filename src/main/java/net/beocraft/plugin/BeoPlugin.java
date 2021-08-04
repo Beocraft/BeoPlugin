@@ -15,7 +15,7 @@ public final class BeoPlugin extends JavaPlugin {
     private final WebhookClient webhook;
 
     public BeoPlugin() throws IOException {
-        String url = Files.readString(Paths.get("webhook.txt"));
+        String url = Files.readString(Paths.get("webhook.txt")).replace("\n", "");
         this.webhook = WebhookClient.withUrl(url);
     }
 
